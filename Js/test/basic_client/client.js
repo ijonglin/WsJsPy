@@ -1,15 +1,22 @@
 /**
  * Created by ijonglin on 12/23/16.
  */
-var ws;
 
-function init() {
+function output(str) {
+    var log = document.getElementById("log");
+    var escaped = str.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;").replace(/"/, "&quot;"); // "
+    log.innerHTML = escaped + "<br>" + log.innerHTML;
+}
 
-    // Connect to Web Socket
-    ws = new WebSocket("ws://localhost:8080/");
+function onSubmit() {
+    ws.send("I got here.")
+}
 
-    // Set event handlers.
-    ws.onopen = function () {
+function main() {
+    // Pass this around as a global.
+    ws = WsJsPyMinimalInit();
+
+    ws.onOpen = function () {
         output("onopen");
     };
 
@@ -21,7 +28,6 @@ function init() {
 
     ws.onclose = function () {
         output("onclose");
-        output("Session to Tecan Robotic service has been shut down.  Close window and restart python service.");
         var mainDiv = document.getElementById("main");
         mainDiv.style.display = "none";
     };
@@ -31,4 +37,8 @@ function init() {
         console.log(e)
     };
 
+    ws.init();
 }
+
+
+

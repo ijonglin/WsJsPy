@@ -1,21 +1,10 @@
 <html>
 <head>
     <title>Simple client</title>
+    <script type="text/javascript" src="../../Ws/min_client.js"></script>
     <script type="text/javascript" src="client.js"></script>
-    <script type="text/javascript">
-        function output(str) {
-            var log = document.getElementById("log");
-            var escaped = str.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;").replace(/"/, "&quot;"); // "
-            log.innerHTML = escaped + "<br>" + log.innerHTML;
-        }
-
-        function onSubmit() {
-            ws.send("I got here.")
-        }
-
-    </script>
 </head>
-<body onload="init();">
+<body onload="main();">
 <div id="main">
 <form onsubmit="onSubmit(); return false;">
     <input type="submit" value="Send">
