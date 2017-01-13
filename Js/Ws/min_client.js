@@ -44,10 +44,10 @@ function WsJsPyMinimalInit() {
         };
     };
 
-    that.send = function(msgObject) {
+    that.send = function(msg) {
         if(ws) {
-            // Always marshal data into JSON
-            ws.send(JSON.stringify(msgObject));
+            // Minimal client doesn't do any marshalling
+            ws.send(msg)
         } else {
             ws.onerror(new Error("Trying to send a message on uninitialized websocket object."))
         }

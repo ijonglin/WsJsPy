@@ -52,3 +52,4 @@ def delay_open_ui():
 t = threading.Timer(3, delay_open_ui)
 t.start()
 ws_server.run_forever()
+print("SERVER-SIDE TEST SUCCEEDS, if it gets to this point w/o exceptions.")
