@@ -3,3 +3,12 @@ Placeholder for Python Services
 * HTTPS and local key set-up
 * Test front-end infrastructure
 * ...
+
+To install selenium:
+```{engine='sh'}
+$ sudo apt-get install python-pip
+$ sudo pip install selenium
+```
+
+Gecko Driver
+* https://github.com/mozilla/geckodriver/releases

@@ -1,6 +1,7 @@
 import websocket_server
 import json
 
+
 class WsJsPyBootstrapper:
     def __init__(self, service_handler):
         self.service_handler = service_handler
@@ -27,4 +28,3 @@ class WsJsPyBootstrapper:
             else:
                 print
                 "This service received an request of ", unpacked_message["action"], " that can't handle.  Ignoring."
-
