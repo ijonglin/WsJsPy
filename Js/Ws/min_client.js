@@ -32,8 +32,6 @@ function WsJsPyMinimalInit() {
         };
 
         ws.onmessage = function (e) {
-            // e.data contains received JSON-encoded string.
-            parsed_data = JSON.parse(e.data);
             that.onMessage(e.data);
         };
 
