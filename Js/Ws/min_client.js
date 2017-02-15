@@ -7,7 +7,7 @@ function WsJsPyMinimalInit() {
     var ws;
     // Connect to Web Socket
 
-    // default implemntations.
+    // default implementations.
     that.onOpen = function () {
         console.log("WS: Successfully opened.");
     };
@@ -25,7 +25,22 @@ function WsJsPyMinimalInit() {
     };
 
     that.init = function() {
-        ws = new WebSocket("ws://localhost:8080/");
+        // Written by Chris Coyier from https://css-tricks.com/snippets/javascript/get-url-variables/
+        function getQueryVariable(variable)
+        {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i=0;i<vars.length;i++) {
+                var pair = vars[i].split("=");
+                if(pair[0] == variable){return pair[1];}
+            }
+            return(false);
+        }
+
+        ws_bootstrap_url =  decodeURIComponent(getQueryVariable("WSJSPY_BOOTSTRAP"));
+        console.log("WSJSPY Bootstrap ="+ws_bootstrap_url)
+
+        ws = new WebSocket(ws_bootstrap_url);
         // Set event handlers.
         ws.onopen = function () {
             that.onOpen();
