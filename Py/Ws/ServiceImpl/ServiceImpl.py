@@ -17,7 +17,12 @@ class ServiceImpl:
         self.message_count = 0
 
         def delay_open_ui(file_location):
-            webbrowser.open("file://" + file_location + "?"+ServiceImpl.WSJSPY_BOOTSTRAP_KEY+"="
+            browser = webbrowser.get('firefox')
+            if browser is None:
+                browser = webbrowser.get('chrome')
+            if browser is None:
+                browser = webbrowser
+            browser.open("file://" + file_location + "?"+ServiceImpl.WSJSPY_BOOTSTRAP_KEY+"="
                             + urllib.quote(ws_url, safe=""))
 
         # self.thread_browser = threading.Timer(3, lambda: delay_open_ui(client_file_location))
