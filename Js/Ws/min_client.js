@@ -21,42 +21,62 @@ function WsJsPyMinimalInit() {
     };
 
     that.onError = function () {
-        console.log("WS: Successfully closed.");
+        console.log("WS: Error.");
+    };
+
+    that.onReady = function () {
+        console.log("WS: Ready.");
     };
 
     that.init = function() {
         // Written by Chris Coyier from https://css-tricks.com/snippets/javascript/get-url-variables/
-        function getQueryVariable(variable)
-        {
+        function getQueryVariable(variable) {
             var query = window.location.search.substring(1);
             var vars = query.split("&");
-            for (var i=0;i<vars.length;i++) {
+            for (var i = 0; i < vars.length; i++) {
                 var pair = vars[i].split("=");
-                if(pair[0] == variable){return pair[1];}
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
             }
-            return(false);
-        }
-
-        ws_bootstrap_url =  decodeURIComponent(getQueryVariable("WSJSPY_BOOTSTRAP"));
-        console.log("WSJSPY Bootstrap ="+ws_bootstrap_url)
-
-        ws = new WebSocket(ws_bootstrap_url);
-        // Set event handlers.
-        ws.onopen = function () {
-            that.onOpen();
+            return (false);
         };
 
-        ws.onmessage = function (e) {
-            that.onMessage(e.data);
+        ws_bootstrap_url = decodeURIComponent(getQueryVariable("WSJSPY_BOOTSTRAP"));
+        console.log("WSJSPY Bootstrap =" + ws_bootstrap_url)
+
+        function readyWebSocket(ws_ready) {
+            // Set event handlers.
+            ws_ready.onopen = function () {
+                that.onOpen();
+            };
+
+            ws_ready.onmessage = function (e) {
+                that.onMessage(e.data);
+            };
+
+            ws_ready.onclose = function () {
+                that.onClose();
+            };
+
+            ws_ready.onerror = function (e) {
+                that.onError(e);
+            };
+
+            that.onReady();
         };
 
-        ws.onclose = function () {
-            that.onClose();
+        function retryWebsocketInit() {
+            console.log("Retrying to open Websockets");
+            try {
+                ws = new WebSocket(ws_bootstrap_url);
+                readyWebSocket(ws);
+            } catch(err) {
+                setTimeout(retryWebsocketInit, 100);
+            }
         };
 
-        ws.onerror = function (e) {
-            that.onError(e);
-        };
+        retryWebsocketInit();
     };
 
     that.send = function(msg) {

@@ -20,8 +20,9 @@ class ServiceImpl:
             webbrowser.open("file://" + file_location + "?"+ServiceImpl.WSJSPY_BOOTSTRAP_KEY+"="
                             + urllib.quote(ws_url, safe=""))
 
-        self.thread_browser = threading.Timer(3, lambda: delay_open_ui(client_file_location))
+        # self.thread_browser = threading.Timer(3, lambda: delay_open_ui(client_file_location))
         self.thread_wsserver = threading.Timer(0, lambda: self.ws_server.run_forever())
+        delay_open_ui(client_file_location)
 
     def marshall(self, obj):
         return json.dumps(obj)
@@ -46,7 +47,8 @@ class ServiceImpl:
     def start(self):
         # Note that there's a race condition between websocket server and browser
         self.thread_wsserver.start()
-        self.thread_browser.start()
+        # TODO: Need to start a local websocket client and connect before start the webbrowser
+        # self.thread_browser.start()
 
     def wait_for_server_exit(self, timeout = None):
         self.thread_wsserver.join(timeout)
