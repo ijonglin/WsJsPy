@@ -1,5 +1,6 @@
 import os
 import ServiceImpl
+import RootedHttpServer
 
 print("Starting basic client test...")
 
@@ -20,9 +21,12 @@ def message_router_impl():
         "RAW": raw_handler
     }
 
+
+
+
 client_file_location = os.getcwd() + "/../../../Js/test/basic_client/client.html"
 port = 8080
-WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location, message_router_impl())
+WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 2)
 
 try:
 
