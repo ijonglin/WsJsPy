@@ -28,6 +28,7 @@ class ServiceImpl:
         self.ui_file_server = None
         self.thread_ui_file_server = None
         self.dir_levels_to_serve = dir_levels_to_serve
+        self.shutdown_lock = threading.Lock();
 
     def append_bootstrap_parameter(self, url, ws_url):
         return url + "?" + ServiceImpl.WSJSPY_BOOTSTRAP_KEY + "=" + urllib.quote(ws_url, safe="")
@@ -97,17 +98,34 @@ class ServiceImpl:
         # self.thread_browser.start()
 
 
-    def wait_for_server_exit(self, timeout=None):
-        self.thread_wsserver.join(timeout)
-
     def send_raw(self, message):
         self.ws_server.send_message_to_all(message)
 
+    def main_thread_wait_ws_shutdown(self,timeout=None):
+        self.thread_wsserver.join(timeout)
 
-    def shutdown(self):
-        if self.serve_ui:
-            self.thread_ui_file_server.cancel()
-        self.ws_server.shutdown()
+    def shutdown(self, timeout=None, shutdown_ws_server=True):
+        self.shutdown_lock.acquire()
+        try:
+            if self.serve_ui:
+                if not self.ui_file_server is None:
+                    self.ui_file_server.shutdown()
+                    print "waiting on shutdown of file server"
+                    self.thread_ui_file_server.join(timeout)
+                    if self.thread_ui_file_server.isAlive():
+                        return False
+                    self.ui_file_server = None
+            if not self.ws_server is None and shutdown_ws_server:
+                self.ws_server.shutdown()
+                print "waiting on shutdown of ws"
+                self.thread_wsserver.join(timeout)
+                if self.thread_wsserver.isAlive():
+                    return False
+                self.ws_server = None
+            return True
+        finally:
+            self.shutdown_lock.release()
+
 
     def send(self, message, payload):
         self.send_raw(

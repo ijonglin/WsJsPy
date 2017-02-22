@@ -1,6 +1,6 @@
 import os
 import ServiceImpl
-import RootedHttpServer
+import threading
 
 print("Starting basic client test...")
 
@@ -24,17 +24,28 @@ def message_router_impl():
 
 
 
-client_file_location = os.getcwd() + "/../../../Js/test/basic_client/client.html"
+client_file_location = os.path.abspath("../../../Js/test/basic_client/client.html")
 port = 8080
 WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 2)
 
 try:
 
     WsJsPyController.start()
-    WsJsPyController.wait_for_server_exit()
-    print("SERVER-SIDE TEST SUCCEEDS, if it gets to this point w/o exceptions.")
+    print "Waiting for WS thread to shutdown"
+    WsJsPyController.main_thread_wait_ws_shutdown()
+    print "Waiting for secondary shutdown"
+    if WsJsPyController.shutdown(10, False):
+        print("******************************")
+        print("* SERVER-SIDE TEST SUCCEEDED")
+        print("******************************")
+    else:
+        raise "ERROR: First shutdown call failed with 4 second timeout."
 except:
-    WsJsPyController.shutdown()
-    WsJsPyController.wait_for_server_exit()
-    print("SERVER-SIDE TEST FAILED.")
+    print("******************************")
+    if WsJsPyController.shutdown(4): # 4 second timeout
+        print("* SERVER-SIDE TEST FAILED, but webservices managed to shut down.")
+    else:
+        print("* SERVER-SIDE TEST FAILED, with fun webservices orphaned, unfortunately.")
+        print("* Please kill orphaned web services.")
+    print("******************************")
     raise

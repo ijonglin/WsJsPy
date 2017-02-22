@@ -1,5 +1,4 @@
 import posixpath
-import argparse
 import urllib
 import os
 
