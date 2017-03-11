@@ -1,3 +1,8 @@
+import sys
+sys.path.append("../../../Py/Ws/ServiceImpl")
+sys.path.append("../../../Py/Ws/websocket_server")
+sys.path.append("../../../Py/Ws/RootedHttpServer")
+
 import os
 import ServiceImpl
 import threading
