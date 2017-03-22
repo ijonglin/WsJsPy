@@ -28,21 +28,25 @@ function WsJsPyMinimalInit() {
         console.log("WS: Ready.");
     };
 
-    that.init = function() {
-        // Written by Chris Coyier from https://css-tricks.com/snippets/javascript/get-url-variables/
-        function getQueryVariable(variable) {
-            var query = window.location.search.substring(1);
-            var vars = query.split("&");
-            for (var i = 0; i < vars.length; i++) {
-                var pair = vars[i].split("=");
-                if (pair[0] == variable) {
-                    return pair[1];
+    that.init = function(ws_bootstrap_url) {
+        if(ws_bootstrap_url===undefined) {
+            // Written by Chris Coyier from https://css-tricks.com/snippets/javascript/get-url-variables/
+            function getQueryVariable(variable) {
+                var query = window.location.search.substring(1);
+                var vars = query.split("&");
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split("=");
+                    if (pair[0] == variable) {
+                        return pair[1];
+                    }
                 }
-            }
-            return (false);
-        };
+                return (false);
+            };
 
-        ws_bootstrap_url = decodeURIComponent(getQueryVariable("WSJSPY_BOOTSTRAP"));
+            ws_bootstrap_url = decodeURIComponent(getQueryVariable("WSJSPY_BOOTSTRAP"));
+        }
+
+
         console.log("WSJSPY Bootstrap =" + ws_bootstrap_url)
 
         function readyWebSocket(ws_ready) {
@@ -66,18 +70,23 @@ function WsJsPyMinimalInit() {
             that.onReady();
         };
 
-        function retryWebsocketInit() {
-            console.log("Retrying to open Websockets");
+        function retryWebsocketInit(retryAttempts) {
             try {
                 ws = new WebSocket(ws_bootstrap_url);
                 readyWebSocket(ws);
             } catch(err) {
-                setTimeout(retryWebsocketInit, 100);
+                console.log("Retrying to open Websockets: "+retryAttempts+" attempts remaining.");
+                setTimeout(function() { retryWebsocketInit(retryAttempts-1);} , 250);
             }
         };
-
-        retryWebsocketInit();
+        retryWebsocketInit(10);
     };
+
+    that.close = function() {
+        if(ws) {
+            ws.close();
+        }
+    }
 
     that.send = function(msg) {
         if(ws) {
