@@ -5,6 +5,12 @@ from selenium import webdriver
 
 
 class MinServer:
+    """
+    Simple integration of server infrastructure and web browser client from the same machine.
+    In the future, this framework should be available for selenium for basic end-to-end testing.
+    By placing this server in its own thread, you can control its lifetime by controlling
+    the lifetime of the thread.
+    """
     def __init__(self, client_html_location, message_handler, selenium_tester=None):
         print("Listening for Websockets request on port 8080")
         self.ws_server = websocket_server.WebsocketServer(8080)

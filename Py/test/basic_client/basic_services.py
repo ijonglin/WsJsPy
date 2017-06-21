@@ -9,6 +9,7 @@ import threading
 
 print("Starting basic client test...")
 
+# TODO(ijonglin): Move bootstrap implementation inside of bootstrap_server code
 def message_router_impl():
     def raw_handler(server, message):
         if message == "BOOTSTRAP":

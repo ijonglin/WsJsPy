@@ -8,6 +8,17 @@ import os
 
 
 class ServiceImpl:
+    """
+    Provides minimal server-side and client set of services that meet the requirement of WsJsPy Application Framework,
+    as well an implementation of the bootstrap framework that talks directly to the JS Client, as specified
+    in subdirectory Js/Ws/min_client.js.   Underlying ystem is assumed to have a reasonable browser installed.
+    The servies provided by this object for the minimal WsJsPy system is follows:
+    1.  Websocket Server (Py)
+    2.  HTTP-based Fileserver (Py)
+    3.  Server-based Bootstrap code (Py)
+    4.  Client-based Bootstrap code (Js in /Js/Ws/client.js)
+    5.  Client-based Web Browser (can be started independently from URLs in #2 or by Python on the server resources)
+    """
     MESSAGE_TYPE_KEY = "MessageType"
     MESSAGE_PAYLOAD_KEY = "MessagePayload"
     WSJSPY_BOOTSTRAP_KEY = "WSJSPY_BOOTSTRAP"
@@ -31,9 +42,32 @@ class ServiceImpl:
         self.shutdown_lock = threading.Lock();
 
     def append_bootstrap_parameter(self, url, ws_url):
+        """
+        Append the proper bootstrap information onto the client page via a query parameter.
+        Code on the JS client side will pick up the information and use it to bootstrap
+        a connection to the Websocket Server provided by this service.
+        :param url:  URL of the client page to be loaded into a browser
+        :type url: String
+        :param ws_url:  URL of the websocket server
+        :type ws_url: String
+        :return: URL of the client page with the Websocket URL appended with proper bootstrap parameter
+        :rtype: String
+        """
         return url + "?" + ServiceImpl.WSJSPY_BOOTSTRAP_KEY + "=" + urllib.quote(ws_url, safe="")
 
     def convert_to_file_url(self, file_location, ws_url):
+        """
+        Helper function to convert an absolute file location to URL that is digestable
+        by a browser.   Not recommended for use in browsers, since different browsers
+        have differently policies w.r.t. access of local files.  Always better to
+        serve the files on the provided http server.  Only tested for Linux/MacOS type filesystems.
+        :param file_location:  Absolute file location
+        :type file_location: String
+        :param ws_url: URL of Websocket Service
+        :type ws_url: String
+        :return:  URL of local client page hosted on the filesystem append with the proper bootstrap parameter.
+        :rtype: String
+        """
         return self.append_bootstrap_parameter("file://" + file_location, ws_url)
 
     def delay_open_ui(self, url_to_open):
