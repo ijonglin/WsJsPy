@@ -3,6 +3,7 @@ import posixpath
 import urllib
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
+import ssl
 
 
 class RootedHTTPServer(HTTPServer):
@@ -65,3 +66,8 @@ def ConstructRootedHttpServer(server, port, directory_to_serve):
     """
     server_address = (server, port)
     return RootedHTTPServer(directory_to_serve, server_address, RootedHTTPRequestHandler)
+
+def ConstructRootedSecureHttpServer(server, port, directory_to_serve, certfile):
+    server = ConstructRootedHttpServer(server, port, directory_to_serve)
+    server.socket = ssl.wrap_socket(server.socket, certfile=certfile, server_side=True)
+    return server

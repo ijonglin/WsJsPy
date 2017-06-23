@@ -28,14 +28,21 @@ def message_router_impl():
     }
 
 
-
-
 client_file_location = os.path.abspath("../../../Js/test/basic_client/client.html")
 port = 8080
-WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 2)
+use_https_version = False # Change to True if you want to try the HTTPS version.
+
+if use_https_version:
+    print "Running HTTPS Version of WsJsPy Service"
+    # HTTPS Version of the Service.  Requires some set-up.
+    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 2,
+                                           server_certfile='wsjspy-selfsigned.pem', browser_pref='google-chrome')
+else:
+    print "Running plain ol' HTTP Version of WsJsPy Service"
+    # Plain ol' HTTP Version of the Service
+    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 2)
 
 try:
-
     WsJsPyController.start()
     print "Waiting for WS thread to shutdown"
     WsJsPyController.main_thread_wait_ws_shutdown()

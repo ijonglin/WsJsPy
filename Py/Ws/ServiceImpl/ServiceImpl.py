@@ -26,7 +26,9 @@ class ServiceImpl:
     def __init__(self, port, client_file_location, message_router,
                  dir_levels_to_serve = 0,
                  start_browser=True,
-                 serve_ui=True
+                 serve_ui=True,
+                 server_certfile=None,
+                 browser_pref=None
                  ):
         self.ws_url = "ws://localhost:" + str(port)
         self.ws_server = websocket_server.WebsocketServer(port)
@@ -39,7 +41,9 @@ class ServiceImpl:
         self.ui_file_server = None
         self.thread_ui_file_server = None
         self.dir_levels_to_serve = dir_levels_to_serve
-        self.shutdown_lock = threading.Lock();
+        self.shutdown_lock = threading.Lock()
+        self.server_certfile = server_certfile
+        self.browser_pref = browser_pref
 
     def append_bootstrap_parameter(self, url, ws_url):
         """
@@ -71,7 +75,10 @@ class ServiceImpl:
         return self.append_bootstrap_parameter("file://" + file_location, ws_url)
 
     def delay_open_ui(self, url_to_open):
-        browser = webbrowser.get('firefox')
+        if self.browser_pref is None:
+            browser = webbrowser.get('firefox')
+        else:
+            browser = webbrowser.get(using=self.browser_pref)
         if browser is None:
             browser = webbrowser.get('chrome')
         if browser is None:
@@ -105,11 +112,18 @@ class ServiceImpl:
         dir_cut_point = 0-levels_to_serve
         dir_to_add = '/'.join(dir_array[dir_cut_point:])
         dir_to_serve = '/'.join(dir_array[:dir_cut_point])
-        self.ui_file_server = RootedHttpServer.ConstructRootedHttpServer(
-            "localhost", 8008, dir_to_serve)
-        self.thread_ui_file_server =threading.Timer(0, lambda: self.ui_file_server.serve_forever())
-        self.thread_ui_file_server.start()
-        return "http://localhost:8008/"+dir_to_add+"/"+os.path.basename(file_location)
+        if self.server_certfile is None:
+            self.ui_file_server = RootedHttpServer.ConstructRootedHttpServer(
+                "localhost", 8008, dir_to_serve)
+            self.thread_ui_file_server =threading.Timer(0, lambda: self.ui_file_server.serve_forever())
+            self.thread_ui_file_server.start()
+            return "http://localhost:8008/"+dir_to_add+"/"+os.path.basename(file_location)
+        else:
+            self.ui_file_server = RootedHttpServer.ConstructRootedSecureHttpServer(
+                "localhost", 8008, dir_to_serve, self.server_certfile);
+            self.thread_ui_file_server =threading.Timer(0, lambda: self.ui_file_server.serve_forever())
+            self.thread_ui_file_server.start()
+            return "https://localhost:8008/"+dir_to_add+"/"+os.path.basename(file_location)
 
     def start(self):
         # self.thread_browser = threading.Timer(3, lambda: delay_open_ui(client_file_location))
