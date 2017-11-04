@@ -142,7 +142,7 @@ class ServiceImpl:
         if self.start_browser:
             self.delay_open_ui(url_to_open)
         else:
-            print "You need to open the link in "
+            print "You need to open the link in " + url_to_open
         # self.thread_browser.start()
 
 
