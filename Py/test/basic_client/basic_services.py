@@ -6,6 +6,7 @@ sys.path.append("../../../Py/Ws/RootedHttpServer")
 import os
 import ServiceImpl
 import threading
+import argparse
 
 print("Starting basic client test...")
 
@@ -30,8 +31,20 @@ def message_router_impl():
 
 client_file_location = os.path.abspath("../../../Js/test/basic_client/client.html")
 port = 8888
-use_https_version = False # Change to True if you want to try the HTTPS version.
-start_browser = False
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+	'--use_https', default = False, type = int,
+	help = 'Start up main WsJsPy Server with self-signed HTTPS'
+	)
+parser.add_argument(
+	'--start_browser', default = False, type = int,
+	help = 'Automatically start browser within Python'
+	)
+args = parser.parse_args()
+
+use_https_version = (args.use_https ==  1) # Change to True if you want to try the HTTPS version.
+start_browser = (args.start_browser == 1)
 
 if use_https_version:
     print "Running HTTPS Version of WsJsPy Service"
