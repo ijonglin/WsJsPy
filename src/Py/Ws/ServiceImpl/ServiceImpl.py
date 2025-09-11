@@ -3,9 +3,10 @@ import os
 import threading
 import urllib
 import webbrowser
+from urllib.parse import urlencode
 
-from . import RootedHttpServer
-from . import websocket_server
+import RootedHttpServer
+import websocket_server
 
 
 class ServiceImpl:
@@ -58,7 +59,7 @@ class ServiceImpl:
         :return: URL of the client page with the Websocket URL appended with proper bootstrap parameter
         :rtype: String
         """
-        return url + "?" + ServiceImpl.WSJSPY_BOOTSTRAP_KEY + "=" + urllib.quote(ws_url, safe="")
+        return url + "?" + urlencode({ ServiceImpl.WSJSPY_BOOTSTRAP_KEY : ws_url})
 
     def convert_to_file_url(self, file_location, ws_url):
         """
@@ -158,7 +159,7 @@ class ServiceImpl:
                     self.ui_file_server.shutdown()
                     print("waiting on shutdown of file server")
                     self.thread_ui_file_server.join(timeout)
-                    if self.thread_ui_file_server.isAlive():
+                    if self.thread_ui_file_server.is_alive():
                         return False
                     self.ui_file_server = None
             if self.ws_server is not None and shutdown_ws_server:
