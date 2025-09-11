@@ -1,15 +1,16 @@
 import os
 import posixpath
+import ssl
 import urllib
+
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
-import ssl
 
 
 class RootedHTTPServer(HTTPServer):
     """
     Simple Subclass that serves a read-only file system directory onto HTTP where Python is running. Pages that are
-    then locally created within the file system can be used, as the basis for WsJsPy application UI.  Primarly,
+    then locally created within the file system can be used, as the basis for WsJsPy application UI.  Primarily,
     just create an internal class property that is available to the subclassed RootedHTTPRequestHandler handler.
     Currently, this implementation is tested only for Linux and MacOS type file systems, but should be written to
     handle WindowOS systems.
@@ -36,6 +37,7 @@ class RootedHTTPRequestHandler(SimpleHTTPRequestHandler):
         :rtype: another string (I assume)
         """
         # Remove any query parameters
+        # TODO: replace with parsing construct
         path = path.split('?')[0]
         path = posixpath.normpath(urllib.unquote(path))
         words = path.split('/')
@@ -66,6 +68,7 @@ def ConstructRootedHttpServer(server, port, directory_to_serve):
     """
     server_address = (server, port)
     return RootedHTTPServer(directory_to_serve, server_address, RootedHTTPRequestHandler)
+
 
 def ConstructRootedSecureHttpServer(server, port, directory_to_serve, certfile):
     server = ConstructRootedHttpServer(server, port, directory_to_serve)

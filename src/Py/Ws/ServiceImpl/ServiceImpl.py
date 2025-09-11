@@ -1,10 +1,11 @@
-import webbrowser
-import urllib
-import threading
 import json
-import websocket_server
-import RootedHttpServer
 import os
+import threading
+import urllib
+import webbrowser
+
+from . import RootedHttpServer
+from . import websocket_server
 
 
 class ServiceImpl:
@@ -24,7 +25,7 @@ class ServiceImpl:
     WSJSPY_BOOTSTRAP_KEY = "WSJSPY_BOOTSTRAP"
 
     def __init__(self, port, client_file_location, message_router,
-                 dir_levels_to_serve = 0,
+                 dir_levels_to_serve=0,
                  start_browser=True,
                  serve_ui=True,
                  server_certfile=None,
@@ -91,10 +92,8 @@ class ServiceImpl:
     def demarshall(self, message):
         return json.loads(message)
 
-
     def router_fallback(self, name, payload):
         raise RuntimeError("Unrecognized message to be routed.")
-
 
     def message_received(self, client, server, message):
         self.message_count += 1
@@ -109,21 +108,21 @@ class ServiceImpl:
 
     def start_file_server(self, file_location, levels_to_serve):
         dir_array = os.path.dirname(file_location).split(os.path.sep)
-        dir_cut_point = 0-levels_to_serve
+        dir_cut_point = 0 - levels_to_serve
         dir_to_add = '/'.join(dir_array[dir_cut_point:])
         dir_to_serve = '/'.join(dir_array[:dir_cut_point])
         if self.server_certfile is None:
             self.ui_file_server = RootedHttpServer.ConstructRootedHttpServer(
                 "localhost", 8008, dir_to_serve)
-            self.thread_ui_file_server =threading.Timer(0, lambda: self.ui_file_server.serve_forever())
+            self.thread_ui_file_server = threading.Timer(0, lambda: self.ui_file_server.serve_forever())
             self.thread_ui_file_server.start()
-            return "http://localhost:8008/"+dir_to_add+"/"+os.path.basename(file_location)
+            return "http://localhost:8008/" + dir_to_add + "/" + os.path.basename(file_location)
         else:
             self.ui_file_server = RootedHttpServer.ConstructRootedSecureHttpServer(
                 "localhost", 8008, dir_to_serve, self.server_certfile);
-            self.thread_ui_file_server =threading.Timer(0, lambda: self.ui_file_server.serve_forever())
+            self.thread_ui_file_server = threading.Timer(0, lambda: self.ui_file_server.serve_forever())
             self.thread_ui_file_server.start()
-            return "https://localhost:8008/"+dir_to_add+"/"+os.path.basename(file_location)
+            return "https://localhost:8008/" + dir_to_add + "/" + os.path.basename(file_location)
 
     def start(self):
         # self.thread_browser = threading.Timer(3, lambda: delay_open_ui(client_file_location))
@@ -142,14 +141,13 @@ class ServiceImpl:
         if self.start_browser:
             self.delay_open_ui(url_to_open)
         else:
-            print "You need to open the link in " + url_to_open
+            print(f"You need to open the link in {url_to_open}")
         # self.thread_browser.start()
-
 
     def send_raw(self, message):
         self.ws_server.send_message_to_all(message)
 
-    def main_thread_wait_ws_shutdown(self,timeout=None):
+    def main_thread_wait_ws_shutdown(self, timeout=None):
         self.thread_wsserver.join(timeout)
 
     def shutdown(self, timeout=None, shutdown_ws_server=True):
@@ -158,22 +156,21 @@ class ServiceImpl:
             if self.serve_ui:
                 if not self.ui_file_server is None:
                     self.ui_file_server.shutdown()
-                    print "waiting on shutdown of file server"
+                    print("waiting on shutdown of file server")
                     self.thread_ui_file_server.join(timeout)
                     if self.thread_ui_file_server.isAlive():
                         return False
                     self.ui_file_server = None
-            if not self.ws_server is None and shutdown_ws_server:
+            if self.ws_server is not None and shutdown_ws_server:
                 self.ws_server.shutdown()
-                print "waiting on shutdown of ws"
+                print("waiting on shutdown of ws")
                 self.thread_wsserver.join(timeout)
-                if self.thread_wsserver.isAlive():
+                if self.thread_wsserver.is_alive():
                     return False
                 self.ws_server = None
             return True
         finally:
             self.shutdown_lock.release()
-
 
     def send(self, message, payload):
         self.send_raw(

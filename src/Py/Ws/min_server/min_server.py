@@ -1,5 +1,6 @@
 import threading
 import webbrowser
+
 import websocket_server
 from selenium import webdriver
 
@@ -11,6 +12,7 @@ class MinServer:
     By placing this server in its own thread, you can control its lifetime by controlling
     the lifetime of the thread.
     """
+
     def __init__(self, client_html_location, message_handler, selenium_tester=None):
         print("Listening for Websockets request on port 8080")
         self.ws_server = websocket_server.WebsocketServer(8080)
@@ -22,13 +24,12 @@ class MinServer:
         self.ws_server.run_forever()
 
     def _delay_open_ui(self, client_html_location):
-        if(self.selenium_tester is None):
+        if (self.selenium_tester is None):
             webbrowser.open(client_html_location)
         else:
             driver = webdriver.Firefox()
             driver.get(client_html_location)
             self.selenium_tester(driver)
-
 
     def delay_open_ui(self, client_html_location):
         t = threading.Timer(3, lambda: self._delay_open_ui(client_html_location))
