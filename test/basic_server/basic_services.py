@@ -29,7 +29,7 @@ def message_router_impl():
     }
 
 
-client_file_location = os.path.abspath("../../../Js/test/basic_client/client.html")
+client_file_location = os.path.abspath("../../test/basic_client/client.html")
 port = 8888
 
 parser = argparse.ArgumentParser()
@@ -49,13 +49,13 @@ start_browser = (args.start_browser == 1)
 if use_https_version:
     print("Running HTTPS Version of WsJsPy Service")
     # HTTPS Version of the Service.  Requires some set-up.
-    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 2,
+    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 1,
                                            server_certfile='wsjspy-selfsigned.pem', browser_pref='google-chrome',
                                            start_browser = start_browser)
 else:
     print("Running plain ol' HTTP Version of WsJsPy Service")
     # Plain ol' HTTP Version of the Service
-    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 2,
+    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 1,
                                            start_browser = start_browser)
 
 try:
