@@ -1,5 +1,6 @@
-import websocket_server
 import json
+
+import websocket_server
 
 
 class WsJsPyBootstrapper:
@@ -12,6 +13,7 @@ class WsJsPyBootstrapper:
     TODO(ijonglin): Add JSON Schema protocol for run-time messaging checking.
     TODO(ijonglin): Unpacked message should also be decoded as JS dictionary.
     """
+
     def __init__(self, service_handler):
         """
         :param service_handler: a dictionary of functional handlers, where the key maps to the message as a string
@@ -51,16 +53,19 @@ class WsJsPyBootstrapper:
         :rtype: None
         """
         unpacked_message = json.loads(message)
-        print "MESSAGE:", message
+        print(f"MESSAGE:{message}")
         if self.bootstrap_passed:
-            if (self.bootstrap_handler["action"] in self.service_handler):
+            if self.bootstrap_handler["action"] in self.service_handler:
                 self.bootstrap_handler[unpacked_message["action"]](unpacked_message["params"])
             else:
-                print
-                "This service received an request of ", unpacked_message["action"], " that can't handle.  Ignoring."
+                print(
+                    f'This service received an request of {unpacked_message["action"]},  '
+                    f'that cannot handle.  Ignoring.')
         else:
-            if (unpacked_message["action"] in self.service_handler):
+            if unpacked_message["action"] in self.service_handler:
                 self.service_handler[unpacked_message["action"]](unpacked_message["params"])
             else:
-                print
-                "This service received an request of ", unpacked_message["action"], " that can't handle.  Ignoring."
+                print(
+                    f'This service received an request of {unpacked_message["action"]} '
+                    f'that cannot handle.  Ignoring.'
+                )

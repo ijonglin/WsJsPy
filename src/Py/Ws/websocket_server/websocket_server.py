@@ -1,7 +1,8 @@
 # Author: Johan Hanssen Seferidis
 # License: MIT
 
-import re, sys
+import re
+import sys
 import struct
 from base64 import b64encode
 from hashlib import sha1
@@ -241,7 +242,6 @@ class WebSocketHandler(StreamRequestHandler):
 
         else:
             raise Exception("Message is too big. Consider breaking it into chunks.")
-            return
 
         self.request.send(header + payload)
 

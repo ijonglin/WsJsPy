@@ -1,7 +1,7 @@
 import sys
-sys.path.append("../../../Py/Ws/ServiceImpl")
-sys.path.append("../../../Py/Ws/websocket_server")
-sys.path.append("../../../Py/Ws/RootedHttpServer")
+sys.path.append("../../src/Py/Ws/ServiceImpl")
+sys.path.append("../../src/Py/Ws/websocket_server")
+sys.path.append("../../src/Py/Ws/RootedHttpServer")
 
 import os
 import ServiceImpl
@@ -29,7 +29,7 @@ def message_router_impl():
     }
 
 
-client_file_location = os.path.abspath("../../../Js/test/basic_client/client.html")
+client_file_location = os.path.abspath("../../test/basic_client/client.html")
 port = 8888
 
 parser = argparse.ArgumentParser()
@@ -47,22 +47,22 @@ use_https_version = (args.use_https ==  1) # Change to True if you want to try t
 start_browser = (args.start_browser == 1)
 
 if use_https_version:
-    print "Running HTTPS Version of WsJsPy Service"
+    print("Running HTTPS Version of WsJsPy Service")
     # HTTPS Version of the Service.  Requires some set-up.
-    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 2,
+    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 1,
                                            server_certfile='wsjspy-selfsigned.pem', browser_pref='google-chrome',
                                            start_browser = start_browser)
 else:
-    print "Running plain ol' HTTP Version of WsJsPy Service"
+    print("Running plain ol' HTTP Version of WsJsPy Service")
     # Plain ol' HTTP Version of the Service
-    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 2,
+    WsJsPyController = ServiceImpl.ServiceImpl(port, client_file_location,  message_router_impl(), 1,
                                            start_browser = start_browser)
 
 try:
     WsJsPyController.start()
-    print "Waiting for WS thread to shutdown"
+    print("Waiting for WS thread to shutdown")
     WsJsPyController.main_thread_wait_ws_shutdown()
-    print "Waiting for secondary shutdown"
+    print("Waiting for secondary shutdown")
     if WsJsPyController.shutdown(10, False):
         print("******************************")
         print("* SERVER-SIDE TEST SUCCEEDED")
