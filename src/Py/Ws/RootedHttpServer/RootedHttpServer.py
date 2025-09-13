@@ -29,7 +29,12 @@ class RootedHTTPRequestHandler(SimpleHTTPRequestHandler):
         super().__init__(request, client_address, server_class)
 
     def do_GET(self):
-        #  TODO:  change path to the file system root and dump that shit into response.
+        """
+        Basic fileserving GET implementation for this simple web server.
+
+        :return:  side-effect, actions to create correct response 404 or the 200 result
+                  of the file to be served.
+        """
         fs_path = posixpath.normpath(self.server.base_path +"/"+ urlparse(self.path).path)
         if not os.path.exists(fs_path):
             self.send_response(404)
